@@ -8,6 +8,7 @@
 - 화면 오른쪽 위 [↻ 지금 수집] 버튼으로 다시 수집
 """
 import json
+import os
 import re
 import threading
 import webbrowser
@@ -62,19 +63,42 @@ def load_keywords():
     return inc or ["실내건축", "인테리어", "리모델링", "환경개선"], exc
 
 
+TARGET_SITES = {"인천", "서울", "경기"}   # 공사 현장 관심 지역
+ELIGIBLE_ALLOW = {"전국", "인천"}          # 현장이 다른 지역이어도 남길 참가가능지역
+
+
 def collect():
     key, _ = sc.load_env()
     sc.ERRORS.clear()
-    period = sc.period_params()
-    print(f"조회기간 {period['inqryBgnDt']} ~ {period['inqryEndDt']}")
+
+    # 이전 수집 결과 (마감 안 된 공고는 계속 유지하기 위해)
+    prev, prev_meta = [], {}
+    if DATA_FILE.exists():
+        try:
+            prev_meta = json.loads(DATA_FILE.read_text(encoding="utf-8"))
+            prev = prev_meta.get("items", [])
+        except Exception:
+            prev = []
+
+    # 조회 구간: 평소엔 최근 7일. 처음(이전 데이터 없음)엔 3주치를 7일씩 나눠 받음
+    weeks = 1 if prev_meta.get("backfilled") else int(os.environ.get("BACKFILL_WEEKS", "3"))
+    windows, now = [], datetime.now()
+    for w in range(weeks):
+        e = now if w == 0 else (now - timedelta(days=7 * w)).replace(hour=23, minute=59)
+        b = (e - timedelta(days=6)).replace(hour=0, minute=0)
+        windows.append({"inqryDiv": 1, "inqryBgnDt": b.strftime("%Y%m%d%H%M"), "inqryEndDt": e.strftime("%Y%m%d%H%M")})
+        print(f"조회기간 {windows[-1]['inqryBgnDt']} ~ {windows[-1]['inqryEndDt']}")
+    period = {"inqryBgnDt": windows[-1]["inqryBgnDt"], "inqryEndDt": windows[0]["inqryEndDt"]}
 
     kw_inc, kw_exc = load_keywords()
     print(f"키워드 {len(kw_inc)}개 / 제외어 {len(kw_exc)}개")
 
     # ① 최근 7일 공사공고 전체 + 면허제한 정보
-    allb = sc.call_all(key, "search", period)
-    regions = sc.call_all(key, "region", period)
-    licenses = sc.call_all(key, "license", period)
+    allb, regions, licenses = [], [], []
+    for wd in windows:
+        allb += sc.call_all(key, "search", wd)
+        regions += sc.call_all(key, "region", wd)
+        licenses += sc.call_all(key, "license", wd)
 
     # ② 면허제한에 '실내건축'이 걸린 공고 → 무조건 포함
     lic_all = defaultdict(set)
@@ -98,9 +122,11 @@ def collect():
         bids.append(b)
     print(f"→ 전체 공사공고 {len(allb)}건 중 면허 {sum(v == '면허' for v in match.values())}건"
           f" + 키워드 {sum(v != '면허' for v in match.values())}건 = {len(bids)}건")
-    files = sc.call_all(key, "file", period)
-    bases = sc.call_all(key, "base", period)
-    for n, rows in [("search", bids), ("region", regions), ("license", licenses), ("file", files), ("base", bases)]:
+    # 첨부파일은 공고 검색 결과(ntceSpecFileNm1~10)에 이미 들어 있어 별도 조회 생략 → 수집 시간 단축
+    bases = []
+    for wd in windows:
+        bases += sc.call_all(key, "base", wd)
+    for n, rows in [("search", bids), ("region", regions), ("license", licenses), ("base", bases)]:
         sc.save_sample(n, rows)
 
     rgn, lic, fil, base = defaultdict(set), defaultdict(set), defaultdict(list), {}
@@ -110,14 +136,14 @@ def collect():
             rgn[sc.bid_key(r)].add(v)
     for k, vs in lic_all.items():
         lic[k] = {re.sub(r"/.*$", "", x) for x in vs}
-    for r in files:
-        url = sc.pick(r, "atchFileUrl", "ntceSpecDocUrl", contains=["url"])
-        if url:
-            fil[sc.bid_key(r)].append({"name": sc.pick(r, "atchFileNm", "ntceSpecFileNm", contains=["file", "nm"]), "url": url})
+    rng = {}
     for r in bases:
         v = num(sc.pick(r, "bssamt", contains=["bssamt"]))
         if v:
             base[sc.bid_key(r)] = v
+        e = num(r.get("rsrvtnPrceRngEndRate"))  # 예비가격 범위 (예: +2 → ±2%)
+        if e:
+            rng[sc.bid_key(r)] = abs(e)
 
     items, seen = [], set()
     for b in bids:
@@ -125,6 +151,15 @@ def collect():
         if k in seen:
             continue
         seen.add(k)
+        # 관심 지역만 남김: 현장이 인천·서울·경기이거나, 참가지역에 전국·인천이 있는 공고
+        site0 = short_region(b.get("cnstrtsiteRgnNm")) or short_region(b.get("dminsttNm"))
+        allow0 = rgn.get(k, set()) or {"전국"}
+        if site0 not in TARGET_SITES and not (allow0 & ELIGIBLE_ALLOW):
+            continue
+        files = [{"name": b.get(f"ntceSpecFileNm{i}"), "url": b.get(f"ntceSpecDocUrl{i}")}
+                 for i in range(1, 11) if b.get(f"ntceSpecDocUrl{i}")]
+        jr = short_region(b.get("jntcontrctDutyRgnNm1"))
+        joint = {"rgn": jr, "ratio": num(b.get("rgnDutyJntcontrctRt")) or 0} if jr and b.get("rgnDutyJntcontrctYn") == "Y" else None
         price = num(b.get("presmptPrce"))
         rate = num(sc.pick(b, "sucsfbidLwltRate", contains=["lwlt"]))
         site = short_region(sc.pick(b, "cnstrtsiteRgnNm", contains=["cnstrtsite"])) or short_region(b.get("dminsttNm"))
@@ -143,14 +178,21 @@ def collect():
             "match": match.get(k, ""),
             "perf": {"type": "pending"},
             "brief": "pending",
-            "joint": None,
+            "joint": joint,
+            "rng": rng.get(k),
             "posted": str(b.get("bidNtceDt", ""))[:10],
             "close": str(b.get("bidClseDt", ""))[:16],
-            "files": fil.get(k, []),
+            "files": files,
             "url": sc.pick(b, "bidNtceDtlUrl", "bidNtceUrl", contains=["url"]),
         })
+    # 이전 결과 중 이번에 안 잡혔지만 아직 마감 전인 공고는 유지 (공고 후 7일 넘은 진행 중 공고 보존)
+    new_ids = {i["id"] for i in items}
+    now_s = datetime.now().strftime("%Y-%m-%d %H:%M")
+    kept = [i for i in prev if i.get("id") not in new_ids and (i.get("close") or "9999") >= now_s]
+    items += kept
+    print(f"→ 이번 수집 {len(new_ids)}건 + 이전 진행 중 공고 {len(kept)}건 유지")
     data = {"collected_at": datetime.now().strftime("%m.%d %H:%M"), "items": items,
-            "raw_count": len(items), "total_notices": len(allb), "errors": sc.ERRORS[:10],
+            "raw_count": len(items), "backfilled": True, "total_notices": len(allb), "errors": sc.ERRORS[:10],
             "period": f"{period['inqryBgnDt']}~{period['inqryEndDt']}"}
     DATA_FILE.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
     print(f"→ 수집 완료: {len(items)}건")

@@ -430,7 +430,7 @@ function renderDetail(x){
     </div><div class="dcol">
     ${x.rate?`<div class="sec" id="bidSec"></div>`:''}
     </div></div>`;
-  if(x.rate){ if(S.calcFor!==x.id){S.calcFor=x.id;S.calc={rate:x.rate,range:2,step:0.25,mode:'mid'};} renderBid(x); }
+  if(x.rate){ if(S.calcFor!==x.id){S.calcFor=x.id;S.calc={rate:x.rate,range:Math.min(3,Math.max(1,Math.round(x.rng||2))),step:0.25,mode:'mid'};} renderBid(x); }
 }
 
 // ---------- 투찰금액 계산 ----------
