@@ -73,6 +73,8 @@
   .tabs button{border:1px solid var(--line2);background:#fff;padding:7px 11px;border-radius:var(--r-sm);cursor:pointer;font:inherit;font-size:13px;font-weight:600;color:#344054}
   .tabs button.on{background:var(--ink);border-color:var(--ink);color:#fff}
   .toolbar .search{margin-left:auto;width:150px}
+  .list td:nth-child(4),.list td:nth-child(6),.list td:nth-child(7){white-space:nowrap}
+  .list td:nth-child(3){min-width:200px}
   .list th:first-child,.list td:first-child{padding-left:14px;padding-right:2px}
   table.rt{width:100%} table.rt td{white-space:nowrap}
   table{width:100%;border-collapse:collapse}
@@ -116,41 +118,6 @@
   .calc{background:#f8f9fb;border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.6}
   .diag{margin:14px auto 0;max-width:560px;text-align:left;background:#f8f9fb;border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:12.5px;line-height:1.8;color:#344054}
   .diag .err{color:var(--no);word-break:break-all;margin-top:4px}
-  .tablewrap::-webkit-scrollbar{height:10px} .tablewrap::-webkit-scrollbar-thumb{background:#d5d9e0;border-radius:10px}
-  .dtop{display:flex;justify-content:space-between;align-items:center;gap:8px}
-  .bigbtn{border:1px solid var(--line2);background:#fff;border-radius:10px;padding:6px 11px;font:inherit;font-size:12.5px;font-weight:700;color:#344054;cursor:pointer;white-space:nowrap}
-  .bigbtn:hover{border-color:var(--brand);color:var(--brand)}
-  #backdrop{display:none;position:fixed;inset:0;background:rgba(13,17,26,.45);z-index:40}
-  #backdrop.on{display:block}
-  .detail.big{position:fixed;top:4vh;left:50%;transform:translateX(-50%);width:min(1180px,94vw);max-height:92vh;z-index:50;padding:28px 32px;box-shadow:0 24px 60px rgba(0,0,0,.25)}
-  .detail.big h2{font-size:23px}
-  .detail.big .dgrid{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;align-items:start}
-  .detail.big .check .d,.detail.big blockquote{font-size:13.5px}
-  .detail.big .kv{grid-template-columns:repeat(3,1fr)}
-  .pager{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid var(--line);flex-wrap:wrap}
-  .pager:empty{display:none}
-  .pinfo{font-size:12.5px;color:var(--sub)} .pinfo b{color:var(--text)}
-  .pbtns{display:flex;gap:4px;align-items:center}
-  .pbtns button{min-width:34px;height:34px;padding:0 8px;border:1px solid var(--line2);background:#fff;border-radius:10px;font:inherit;font-size:13px;font-weight:600;color:#344054;cursor:pointer}
-  .pbtns button:hover:not(:disabled){border-color:#c4cad4}
-  .pbtns button.on{background:var(--ink);border-color:var(--ink);color:#fff}
-  .pbtns button:disabled{opacity:.35;cursor:default}
-  .pbtns .dots{color:var(--muted);padding:0 2px}
-  table.main{table-layout:fixed;width:100%}
-  table.main td,table.main th{overflow:hidden}
-  table.main th:first-child,table.main td:first-child{padding-left:12px;padding-right:0}
-  table.main td{padding:12px 8px}
-  table.main .tcell .title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  table.main .ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  table.main .tcell>div:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  table.main td:nth-child(4),table.main td:nth-child(6),table.main td:nth-child(7){white-space:nowrap}
-  table.main td.num{font-size:13.5px}
-  .tabs button.t-ok{color:var(--ok);border-color:#bfe6da;background:var(--ok-bg)}
-  .tabs button.t-ok.on{background:var(--ok);border-color:var(--ok);color:#fff}
-  .kpi{cursor:pointer;transition:transform .12s,box-shadow .12s,border-color .12s}
-  .kpi:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(16,24,40,.08)}
-  .kpi.act{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink) inset}
-  .kpi.hero.act{box-shadow:0 0 0 3px #fff inset,0 8px 24px rgba(31,94,255,.35)}
   .note{font-size:11.5px;color:var(--muted);text-align:center;padding:4px 0 24px}
 
   /* 투찰 계산 */
@@ -228,10 +195,10 @@
 
   <main>
     <div class="kpis">
-      <div class="card hero kpi" data-t="ok" title="참여 가능 공고만 보기"><div class="lb">✅ 참여 가능</div><div class="v" id="kOk">0<small>건</small></div></div>
-      <div class="card kpi act" data-t="all" title="전체 공고 보기"><div class="lb">필터 통과 / 수집 (7일)</div><div class="v" id="kAll">0<small>건</small></div></div>
-      <div class="card kpi" data-t="warn" title="확인 필요 공고만 보기"><div class="lb">⚠️ 확인 필요</div><div class="v" id="kWarn" style="color:var(--warn)">0<small>건</small></div></div>
-      <div class="card kpi" data-t="soon" title="3일 내 마감 공고만 보기"><div class="lb">⏰ 3일 내 마감</div><div class="v" id="kSoon" style="color:var(--no)">0<small>건</small></div></div>
+      <div class="card hero"><div class="lb">✅ 참여 가능</div><div class="v" id="kOk">0<small>건</small></div></div>
+      <div class="card"><div class="lb">필터 통과 / 수집 (7일)</div><div class="v" id="kAll">0<small>건</small></div></div>
+      <div class="card"><div class="lb">⚠️ 확인 필요</div><div class="v" id="kWarn" style="color:var(--warn)">0<small>건</small></div></div>
+      <div class="card"><div class="lb">⏰ 3일 내 마감</div><div class="v" id="kSoon" style="color:var(--no)">0<small>건</small></div></div>
     </div>
 
     <div class="content">
@@ -239,31 +206,26 @@
         <div class="toolbar">
           <div class="tabs" id="tabs">
             <button data-t="all" class="on">전체</button>
-            <button data-t="ok" class="t-ok">✓ 참여 가능</button>
+            <button data-t="ok">참여 가능</button>
             <button data-t="warn">확인 필요</button>
             <button data-t="no">불가</button>
             <button data-t="star">★ 관심</button>
-            <button data-t="soon" id="soonTab" style="display:none">⏰ 3일 내 마감</button>
           </div>
           <input type="text" class="search" id="q" placeholder="공고명·기관 검색">
-          <select id="perPage" style="width:96px" title="한 화면에 보여줄 공고 수"><option value="10" selected>10개씩</option><option value="20">20개씩</option><option value="50">50개씩</option><option value="100">100개씩</option></select>
           <select id="sort" style="width:118px">
             <option value="dl">마감 임박순</option>
             <option value="price">금액 큰 순</option>
             <option value="new">최신 공고순</option>
           </select>
         </div>
-        <div class="tablewrap"><table class="main">
-          <colgroup><col style="width:34px"><col style="width:72px"><col><col style="width:74px"><col style="width:78px"><col style="width:66px"><col style="width:62px"></colgroup>
+        <table>
           <thead><tr><th></th><th>판정</th><th>공고명 / 수요기관</th><th>참가지역</th><th class="num">추정가격</th><th>현장설명</th><th>마감</th></tr></thead>
           <tbody id="tbody"></tbody>
-        </table></div>
-        <div id="pager" class="pager"></div>
+        </table>
         <div id="empty" class="empty" style="display:none"></div>
       </div>
 
       <div class="card detail" id="detail"></div>
-      <div id="backdrop" onclick="toggleBig(false)"></div>
     </div>
     <div class="note" id="note">※ 1차 판정: 참가가능지역·면허·낙찰방법 기준. 실적·현장설명회는 공고문 원문 확인 필요</div>
   </main>
@@ -349,25 +311,18 @@ function render(){
   $('#kOk').innerHTML=rows.filter(r=>r.j.st==='ok').length+'<small>건</small>';
   $('#kWarn').innerHTML=rows.filter(r=>r.j.st==='warn').length+'<small>건</small>';
   $('#kSoon').innerHTML=rows.filter(r=>r.j.st!=='no'&&(d(r.close)-TODAY)/86400000<=3).length+'<small>건</small>';
-  if(S.tab==='star') rows=rows.filter(r=>S.stars.has(r.id)); else if(S.tab==='soon') rows=rows.filter(r=>r.j.st!=='no'&&(d(r.close)-TODAY)/86400000<=3); else if(S.tab!=='all') rows=rows.filter(r=>r.j.st===S.tab);
+  if(S.tab==='star') rows=rows.filter(r=>S.stars.has(r.id)); else if(S.tab!=='all') rows=rows.filter(r=>r.j.st===S.tab);
   const so=$('#sort').value;
   rows.sort((a,b)=>so==='price'?(b.price||0)-(a.price||0):so==='new'?d(b.posted)-d(a.posted):d(a.close)-d(b.close));
   const B={ok:['b-ok','참여 가능'],warn:['b-warn','확인 필요'],no:['b-no','불가']};
-  // ---- 페이지 나누기 ----
-  const fkey=JSON.stringify([S.base,S.tab,so,$('#q').value,$$('aside input').map(i=>i.type==='checkbox'?i.checked:i.value)]);
-  if(fkey!==S.fkey){S.fkey=fkey;S.page=1;}
-  const per=+$('#perPage').value, pages=Math.max(1,Math.ceil(rows.length/per));
-  S.page=Math.min(Math.max(1,S.page||1),pages);
-  const from=(S.page-1)*per, pageRows=rows.slice(from,from+per);
-  renderPager(rows.length,per,pages,from,pageRows.length);
-  $('#tbody').innerHTML=pageRows.map(r=>{
+  $('#tbody').innerHTML=rows.map(r=>{
     const dd=dday(r.close), hot=(d(r.close)-TODAY)/86400000<=3;
-    const br=r.brief==='pending'?'<span class="org">원문확인</span>':r.brief?`<span class="chip ${r.brief.must?'red':''}">${r.brief.must?'필참':'선택'}</span><div class="org">${r.brief.date.slice(5)}</div>`:'<span class="org">없음</span>';
+    const br=r.brief==='pending'?'<span class="org">공고문 확인</span>':r.brief?`<span class="chip ${r.brief.must?'red':''}">${r.brief.must?'필참':'선택'}</span><div class="org">${r.brief.date.slice(5)}</div>`:'<span class="org">없음</span>';
     return `<tr class="item ${r.id===S.sel?'sel':''}" data-id="${r.id}">
       <td><span class="star ${S.stars.has(r.id)?'on':''}" data-star="${r.id}">★</span></td>
       <td><span class="badge ${B[r.j.st][0]}">${B[r.j.st][1]}</span></td>
-      <td class="tcell"><div class="title" title="${r.name}">${r.name}</div><div class="org ell" title="${r.org}">${r.org}</div>
-        <div>${r.match?`<span class="chip ${r.match==='면허'?'blue':''}">${r.match==='면허'?'면허 일치':'🔎 '+r.match.replace('키워드:','')}</span>`:''}${r.perf&&r.perf.type!=='pending'?`<span class="chip">실적 ${r.perf.type==='unknown'?'확인':r.perf.type+' '+r.perf.amt+'억'}</span>`:''}${r.joint?`<span class="chip blue">공동도급</span>`:''}${r.method?`<span class="chip" title="${r.method}">${shortMethod(r.method)}</span>`:''}</div></td>
+      <td><div class="title">${r.name}</div><div class="org">${r.org}</div>
+        <div>${r.match?`<span class="chip ${r.match==='면허'?'blue':''}">${r.match==='면허'?'면허 일치':'🔎 '+r.match.replace('키워드:','')}</span>`:''}${r.perf&&r.perf.type!=='pending'?`<span class="chip">실적 ${r.perf.type==='unknown'?'확인':r.perf.type+' '+r.perf.amt+'억'}</span>`:''}${r.joint?`<span class="chip blue">공동도급</span>`:''}${r.method?`<span class="chip">${r.method}</span>`:''}</div></td>
       <td>${r.allow.map(a=>`<span class="chip ${a===S.base||a==='전국'?'blue':''}">${a}</span>`).join('')}<div class="org">현장 ${r.site}</div></td>
       <td class="num">${won(r.price)}</td>
       <td>${br}</td>
@@ -383,53 +338,25 @@ function render(){
   renderDetail(rows.find(r=>r.id===S.sel));
 }
 
-function toggleBig(force){
-  S.big = force===undefined ? !S.big : force;
-  $('#detail').classList.toggle('big',S.big);
-  $('#backdrop').classList.toggle('on',S.big);
-  document.body.style.overflow = S.big?'hidden':'';
-  const b=$('#bigBtn'); if(b) b.textContent = S.big?'✕ 닫기':'⤢ 크게보기';
-}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&S.big)toggleBig(false);});
-
-function renderPager(total,per,pages,from,n){
-  const p=S.page, el=$('#pager');
-  if(!total){el.innerHTML='';return;}
-  const win=[]; const lo=Math.max(1,p-2), hi=Math.min(pages,lo+4);
-  for(let i=Math.max(1,hi-4);i<=hi;i++) win.push(i);
-  const btn=(label,to,cls='',dis=false)=>`<button class="${cls}" data-page="${to}" ${dis?'disabled':''}>${label}</button>`;
-  el.innerHTML=`<div class="pinfo">${total}건 중 <b>${from+1}–${from+n}</b></div>
-    <div class="pbtns">${btn('«',1,'',p===1)}${btn('‹',p-1,'',p===1)}
-    ${win[0]>1?'<span class="dots">…</span>':''}${win.map(i=>btn(i,i,i===p?'on':'')).join('')}${win[win.length-1]<pages?'<span class="dots">…</span>':''}
-    ${btn('›',p+1,'',p===pages)}${btn('»',pages,'',p===pages)}</div>`;
-}
-
-function shortMethod(m){return String(m).split(/[-(]/)[0].trim()||m}
-
 function renderDetail(x){
   const el=$('#detail');
   if(!x){el.innerHTML='<div class="empty">공고를 선택하세요</div>';return;}
   const B={ok:['b-ok','참여 가능'],warn:['b-warn','확인 필요'],no:['b-no','불가']}[x.j.st];
   const lower = x.rate? x.base*x.rate/100 : null;
   el.innerHTML=`
-    <div class="dtop"><div><span class="badge ${B[0]}">${B[1]}</span> <span class="chip">${x.id}</span></div>
-      <button class="bigbtn" id="bigBtn">${S.big?'✕ 닫기':'⤢ 크게보기'}</button></div>
+    <span class="badge ${B[0]}">${B[1]}</span> <span class="chip">${x.id}</span>
     <h2>${x.name}</h2><div class="org">${x.org}</div>
-    <div class="dgrid"><div class="dcol">
     <div class="sec"><h4>자격 체크리스트</h4>
       ${x.j.c.map(i=>`<div class="check"><div class="ic ${i.k}">${i.k==='ok'?'✓':i.k==='warn'?'!':'✕'}</div><div><div class="t">${i.t}</div><div class="d">${i.d}</div></div></div>`).join('')}
     </div>
     ${x.perf&&x.perf.type!=='pending'?`<div class="sec"><h4>공고문 실적 조건 원문 (자동 추출)</h4><blockquote>${x.perf.text}</blockquote></div>`:''}
     <div class="sec"><h4>공고 정보</h4><div class="kv">
-      ${[['추정가격',won(x.price)],['기초금액',won(x.base)],['낙찰방법',(x.method?shortMethod(x.method):'-')+(x.rate?' · '+x.rate.toFixed(3)+'%':'')],['업종',x.lic],['공사 현장',x.site],['공고일',x.posted]].map(([k,v])=>`<div class="box"><div class="k">${k}</div><div class="val">${v}</div></div>`).join('')}
+      ${[['추정가격',won(x.price)],['기초금액',won(x.base)],['낙찰방법',x.method+(x.rate?' · '+x.rate.toFixed(3)+'%':'')],['업종',x.lic],['공사 현장',x.site],['공고일',x.posted]].map(([k,v])=>`<div class="box"><div class="k">${k}</div><div class="val">${v}</div></div>`).join('')}
       <div class="box" style="grid-column:1/-1"><div class="k">입찰 마감</div><div class="val">${x.close} <span class="dday ${(d(x.close)-TODAY)/86400000<=3?'hot':''}">${dday(x.close)}</span></div></div>
     </div></div>
-
-    ${(x.files||[]).length?`<div class="sec"><h4>첨부파일</h4>${x.files.map(f=>`<a class="file" href="${f.url}" target="_blank" rel="noopener">📄 ${f.name||'첨부파일'}</a>`).join('')}</div>`:''}
-    <div class="btns"><button class="btn pri" onclick="${x.url?`window.open('${x.url}','_blank')`:'alert(\'공고 링크 정보가 없습니다\')'}">나라장터에서 공고 보기 ↗</button></div>
-    </div><div class="dcol">
     ${x.rate?`<div class="sec" id="bidSec"></div>`:''}
-    </div></div>`;
+    ${(x.files||[]).length?`<div class="sec"><h4>첨부파일</h4>${x.files.map(f=>`<a class="file" href="${f.url}" target="_blank" rel="noopener">📄 ${f.name||'첨부파일'}</a>`).join('')}</div>`:''}
+    <div class="btns"><button class="btn pri" onclick="${x.url?`window.open('${x.url}','_blank')`:'alert(\'공고 링크 정보가 없습니다\')'}">나라장터에서 공고 보기 ↗</button></div>`;
   if(x.rate){ if(S.calcFor!==x.id){S.calcFor=x.id;S.calc={rate:x.rate,range:2,step:0.25,mode:'mid'};} renderBid(x); }
 }
 
@@ -497,7 +424,6 @@ $('#detail').addEventListener('change',e=>{
   renderBid(x);
 });
 $('#detail').addEventListener('click',e=>{
-  if(e.target.id==='bigBtn'){toggleBig();return;}
   const m=e.target.dataset.m; if(!m) return; S.calc.mode=m; renderBid(DATA.find(d=>d.id===S.calcFor));
 });
 
@@ -507,19 +433,8 @@ $('#tbody').addEventListener('click',e=>{
   const tr=e.target.closest('tr.item'); if(tr){S.sel=tr.dataset.id;render();}
 });
 $$('#baseSeg button').forEach(b=>b.onclick=()=>{$$('#baseSeg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');S.base=b.dataset.v;render();});
-function setTab(t){
-  S.tab=t;
-  $$('#tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
-  $$('.kpi').forEach(x=>x.classList.toggle('act',x.dataset.t===t));
-  const sb=$('#soonTab'); sb.style.display=t==='soon'?'':'none';
-  render();
-}
-$$('#tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
-$$('.kpi').forEach(c=>c.onclick=()=>setTab(c.dataset.t));  // 스크롤 이동 없이 목록만 전환
+$$('#tabs button').forEach(b=>b.onclick=()=>{$$('#tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');S.tab=b.dataset.t;render();});
 $$('aside input, #q, #sort').forEach(i=>i.addEventListener('input',render));
-$('#perPage').addEventListener('change',()=>{S.page=1;localStorageSet('perPage',$('#perPage').value);render();});
-$('#pager').addEventListener('click',e=>{const b=e.target.closest('button[data-page]'); if(!b||b.disabled) return; S.page=+b.dataset.page; render(); $('.list').scrollIntoView({behavior:'smooth',block:'start'});});
-{const pp=localStorageGet('perPage'); if(pp) $('#perPage').value=pp;}
 
 const DEF={hasSchool:true,schoolAmt:1,onlyQual:true,pMin:0.5,pMax:5,onlySchool:false,hideMissed:true};
 function countFilters(){let n=0;if($$('.rgn:checked').length<3)n++;if($('#onlyQual').checked)n++;if(+$('#pMin').value!==0||+$('#pMax').value<99)n++;if($('#onlySchool').checked)n++;if($('#hideMissed').checked)n++;if($('#q').value)n++;$('#fcnt').textContent='적용 필터 '+n+'개';}

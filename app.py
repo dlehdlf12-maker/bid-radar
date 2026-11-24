@@ -182,6 +182,10 @@ class Handler(SimpleHTTPRequestHandler):
                 return {"error": repr(e), "items": []}
 
     def do_GET(self):
+        if self.path.startswith("/favicon"):
+            self.send_response(204)
+            self.end_headers()
+            return
         if self.path.startswith("/api/bids"):
             if DATA_FILE.exists():
                 return self._json(json.loads(DATA_FILE.read_text(encoding="utf-8")))
@@ -206,8 +210,12 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_error(404)
 
     def log_message(self, fmt, *args):
-        if "/api/" in (args[0] if args else ""):
+        # API 요청만 콘솔에 표시 (args[0]이 문자열이 아닐 때도 안전하게)
+        if args and "/api/" in str(args[0]):
             super().log_message(fmt, *args)
+
+    def log_error(self, fmt, *args):
+        pass  # favicon 등 사소한 404는 콘솔에 표시하지 않음
 
 
 def self_check():
