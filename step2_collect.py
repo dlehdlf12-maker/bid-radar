@@ -101,6 +101,24 @@ def period_params(days=None):
     return {"inqryDiv": 1, "inqryBgnDt": start.strftime("%Y%m%d%H%M"), "inqryEndDt": end.strftime("%Y%m%d%H%M")}
 
 
+RETRIES = 4  # 접속 실패(타임아웃 등) 시 재시도 횟수
+
+
+def get_retry(url, params, op_name="", page=1):
+    """해외 서버(GitHub)에서 간헐적으로 나는 접속·SSL 타임아웃을 재시도로 흡수"""
+    import time
+    for i in range(RETRIES + 1):
+        try:
+            return requests.get(url, params=params, timeout=60)
+        except Exception as e:  # URLError, 타임아웃, 연결 끊김 등
+            if i == RETRIES:
+                print(f"  ⚠️ [{op_name}] p{page} 최종 실패: {e!r}")
+                return None
+            wait = 5 * (i + 1)
+            print(f"  … [{op_name}] p{page} 접속 오류({type(e).__name__}) → {wait}초 후 재시도 {i + 1}/{RETRIES}")
+            time.sleep(wait)
+
+
 PAGE_SIZE = 500  # 한 번에 받는 건수 (API 호출 횟수 절약). 오류 나면 자동으로 100으로 낮춤
 
 
@@ -110,7 +128,11 @@ def call_all(key, op_name, extra):
     out, page, calls = [], 1, 0
     while True:
         params = {"serviceKey": key, "pageNo": page, "numOfRows": size, "type": "json", **extra}
-        r = requests.get(f"{BASE}/{OP[op_name]}", params=params, timeout=60)
+        r = get_retry(f"{BASE}/{OP[op_name]}", params, op_name, page)
+        if r is None:  # 재시도까지 실패 → 이 항목은 여기까지만 받고 다음으로 진행
+            ERRORS.append(f"[{op_name}] {page}페이지 접속 실패(재시도 {RETRIES}회) — 일부 누락 가능")
+            print(f"  ⚠️ [{op_name}] {page}페이지 접속 실패 — 받은 {len(out)}건까지만 사용")
+            return out
         calls += 1
         try:
             data = r.json()
