@@ -30,7 +30,7 @@ jobs:
         env:
           SERVICE_KEY: ${{ secrets.SERVICE_KEY }}
           TZ: Asia/Seoul
-        run: python collect.py
+        run: python -u collect.py
 
       - name: 결과 저장 (변경 있을 때만)
         run: |
