@@ -190,6 +190,13 @@ def collect():
     now_s = datetime.now().strftime("%Y-%m-%d %H:%M")
     kept = [i for i in prev if i.get("id") not in new_ids and (i.get("close") or "9999") >= now_s]
     items += kept
+    # 정정공고(차수 -001, -002…)가 나오면 이전 차수는 버리고 최신 차수만 남김
+    latest = {}
+    for i in items:
+        no, _, ordn = i["id"].rpartition("-")
+        if no not in latest or ordn > latest[no]["id"].rpartition("-")[2]:
+            latest[no] = i
+    items = list(latest.values())
     print(f"→ 이번 수집 {len(new_ids)}건 + 이전 진행 중 공고 {len(kept)}건 유지")
     data = {"collected_at": datetime.now().strftime("%m.%d %H:%M"), "items": items,
             "raw_count": len(items), "backfilled": True, "total_notices": len(allb), "errors": sc.ERRORS[:10],

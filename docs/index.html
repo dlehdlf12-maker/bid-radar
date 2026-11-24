@@ -213,7 +213,13 @@
     </div>
 
     <h3>낙찰방법</h3>
-    <div class="chips"><label class="chk"><input type="checkbox" id="onlyQual" checked>적격심사만</label></div>
+    <div class="chips">
+      <label class="chk"><input type="checkbox" class="mth" value="적격" checked>적격심사</label>
+      <label class="chk"><input type="checkbox" class="mth" value="최저가" checked>최저가</label>
+      <label class="chk"><input type="checkbox" class="mth" value="소액" checked>소액수의견적</label>
+      <label class="chk"><input type="checkbox" class="mth" value="기타" checked>기타</label>
+    </div>
+    <div class="hint">사립대·공기업은 <b>최저가</b>, 소규모 공사는 <b>소액수의견적</b>이 많습니다</div>
 
     <h3>추정가격</h3>
     <div class="row2" style="margin-top:0"><input type="number" id="pMin" value="0.5" step="0.5"><span>~</span><input type="number" id="pMax" value="5" step="0.5"><span>억</span></div>
@@ -274,6 +280,11 @@ let TODAY = new Date();
 // 가상 샘플 데이터
 let DATA = [];  // /api/bids 에서 불러옴
 let META = {};
+function methodGroup(m){m=String(m||'');return /적격/.test(m)?'적격':/최저가/.test(m)?'최저가':/소액|수의/.test(m)?'소액':'기타';}
+function latestOnly(arr){  // 정정공고는 최신 차수만 표시
+  const m={}; for(const i of arr){const [no,ord]=[i.id.slice(0,i.id.lastIndexOf('-')),i.id.slice(i.id.lastIndexOf('-')+1)];
+    if(!m[no]||ord>m[no].id.slice(m[no].id.lastIndexOf('-')+1)) m[no]=i;} return Object.values(m);
+}
 function localStorageGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function localStorageSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
 async function load(refresh){
@@ -289,7 +300,7 @@ async function load(refresh){
         const j2=await r2.json(); if(j2.error) alert('수집 오류: '+j2.error); Object.assign(j,j2,{error:j2.error});
       }
     } else if(j.error){alert('수집 오류: '+j.error);}
-    DATA=j.items||[]; TODAY=new Date(); META=j;
+    DATA=latestOnly(j.items||[]); TODAY=new Date(); META=j;
     $('#lastAt').textContent=j.collected_at||'-';
     if(!DATA.find(x=>x.id===S.sel)) S.sel=DATA[0]?.id||null;
     render();
@@ -321,7 +332,7 @@ function judge(x){
   else {const past=d(x.brief.date)<TODAY;
     if(x.brief.must&&past) c.push({k:'no',t:'현장설명회 (필참)',d:`${x.brief.date} — 이미 지남, 참여 불가`});
     else c.push({k:x.brief.must?'warn':'ok',t:`현장설명회 (${x.brief.must?'필참':'선택'})`,d:`${x.brief.date} · ${x.brief.place}${x.brief.must?' — 일정 확보 필요':''}`});}
-  const mOk = /적격/.test(x.method||''); if(!x.method) c.push({k:'warn',soft:true,t:'낙찰방법',d:'정보 없음 — 공고문 확인'}); else c.push({k:mOk?'ok':'warn',t:'낙찰방법',d:mOk?`${x.method}${x.rate?' · 낙찰하한율 '+x.rate.toFixed(3)+'%':''}`:(x.method||'정보 없음')});
+  const mOk = /적격/.test(x.method||''); if(!x.method) c.push({k:'warn',soft:true,t:'낙찰방법',d:'정보 없음 — 공고문 확인'}); else c.push({k:'ok',t:'낙찰방법',d:`${x.method}${x.rate?' · 낙찰하한율 '+x.rate.toFixed(3)+'%':''}`});
   const st = c.some(i=>i.k==='no')?'no':c.some(i=>i.k==='warn' && !i.soft && !i.t.startsWith('현장설명회'))?'warn':'ok';
   return {st,c};
 }
@@ -331,7 +342,7 @@ function filtered(){
   const pMin=+$('#pMin').value, pMax=+$('#pMax').value;
   return DATA.map(x=>({...x,j:judge(x)})).filter(x=>{
     if(x.site && !rg.includes(x.site)) return false;
-    if($('#onlyQual').checked && x.method && !/적격/.test(x.method)) return false;  // 낙찰방법 정보가 없으면 숨기지 않음
+    if(x.method && !$$('.mth:checked').map(e=>e.value).includes(methodGroup(x.method))) return false;  // 낙찰방법 정보가 없으면 숨기지 않음
     if(x.price!=null && (x.price<pMin||x.price>pMax)) return false;
     if($('#onlySchool').checked && !/교육|학교|초|중|고|유치원/.test(x.org)) return false;
     if($('#hideMissed').checked && x.brief && x.brief.must && d(x.brief.date)<TODAY) return false;
@@ -521,10 +532,10 @@ $('#perPage').addEventListener('change',()=>{S.page=1;localStorageSet('perPage',
 $('#pager').addEventListener('click',e=>{const b=e.target.closest('button[data-page]'); if(!b||b.disabled) return; S.page=+b.dataset.page; render(); $('.list').scrollIntoView({behavior:'smooth',block:'start'});});
 {const pp=localStorageGet('perPage'); if(pp) $('#perPage').value=pp;}
 
-const DEF={hasSchool:true,schoolAmt:1,onlyQual:true,pMin:0.5,pMax:5,onlySchool:false,hideMissed:true};
-function countFilters(){let n=0;if($$('.rgn:checked').length<3)n++;if($('#onlyQual').checked)n++;if(+$('#pMin').value!==0||+$('#pMax').value<99)n++;if($('#onlySchool').checked)n++;if($('#hideMissed').checked)n++;if($('#q').value)n++;$('#fcnt').textContent='적용 필터 '+n+'개';}
+const DEF={hasSchool:true,schoolAmt:1,pMin:0.5,pMax:5,onlySchool:false,hideMissed:true};
+function countFilters(){let n=0;if($$('.rgn:checked').length<3)n++;if($$('.mth:checked').length<4)n++;if(+$('#pMin').value!==0||+$('#pMax').value<99)n++;if($('#onlySchool').checked)n++;if($('#hideMissed').checked)n++;if($('#q').value)n++;$('#fcnt').textContent='적용 필터 '+n+'개';}
 $('#refreshBtn').onclick=()=>load(true);
-$('#resetBtn').onclick=()=>{$('#hasSchool').checked=DEF.hasSchool;$('#schoolAmt').value=DEF.schoolAmt;$('#onlyQual').checked=DEF.onlyQual;$('#pMin').value=DEF.pMin;$('#pMax').value=DEF.pMax;$('#onlySchool').checked=DEF.onlySchool;$('#hideMissed').checked=DEF.hideMissed;$$('.rgn').forEach(e=>e.checked=true);$('#q').value='';render();};
+$('#resetBtn').onclick=()=>{$('#hasSchool').checked=DEF.hasSchool;$('#schoolAmt').value=DEF.schoolAmt;$$('.mth').forEach(e=>e.checked=true);$('#pMin').value=DEF.pMin;$('#pMax').value=DEF.pMax;$('#onlySchool').checked=DEF.onlySchool;$('#hideMissed').checked=DEF.hideMissed;$$('.rgn').forEach(e=>e.checked=true);$('#q').value='';render();};
 load(false);
 </script>
 </body>
