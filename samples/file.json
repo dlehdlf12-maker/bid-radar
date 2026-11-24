@@ -1,0 +1,29 @@
+[
+  {
+    "bidNtceNo": "20170425385",
+    "bidNtceOrd": "005",
+    "ntceNticeDt": "2026-11-24 11:07",
+    "atchSno": "1",
+    "atchDocDivNm": "공고서",
+    "atchFileNm": "공고 20170425385-05 강관파일.hwp",
+    "atchFileUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=20170425385&bidPbancOrd=005&fileType=&fileSeq=1&prcmBsneSeCd=01"
+  },
+  {
+    "bidNtceNo": "R26BK01478910",
+    "bidNtceOrd": "003",
+    "ntceNticeDt": "2026-11-19 17:36",
+    "atchSno": "1",
+    "atchDocDivNm": "공고서",
+    "atchFileNm": "공고서(컨테이너하우스)R26BK01478910-003.hwpx",
+    "atchFileUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01478910&bidPbancOrd=003&fileType=&fileSeq=1&prcmBsneSeCd=01"
+  },
+  {
+    "bidNtceNo": "R26BK01478910",
+    "bidNtceOrd": "003",
+    "ntceNticeDt": "2026-11-19 17:36",
+    "atchSno": "2",
+    "atchDocDivNm": "공고서",
+    "atchFileNm": "정정공고 신구대비표-R26BK01478910-003(게시용).hwpx",
+    "atchFileUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01478910&bidPbancOrd=003&fileType=&fileSeq=2&prcmBsneSeCd=01"
+  }
+]
