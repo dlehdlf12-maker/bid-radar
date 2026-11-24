@@ -75,6 +75,8 @@ def load_env():
     env = next((d / n for d in (HERE, HERE.parent) for n in names if (d / n).is_file()
                 and "SERVICE_KEY=" in (d / n).read_text(encoding="utf-8-sig", errors="ignore")
                 and "여기에_일반인증키" not in (d / n).read_text(encoding="utf-8-sig", errors="ignore")), None)
+    if env is None and os.environ.get("SERVICE_KEY"):  # GitHub Actions 등: 환경변수로 받은 키 사용
+        return unquote(os.environ["SERVICE_KEY"].strip()), os.environ.get("BASE_REGION", "인천")
     if env is None:
         raise SystemExit(f"NO_ENV|인증키 파일을 찾을 수 없습니다. 위치: {HERE}")
     if env:
